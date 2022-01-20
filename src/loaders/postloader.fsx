@@ -18,8 +18,6 @@ type Post = {
     summary: string
 }
 
-let contentDir = "posts"
-
 let markdownPipeline =
     MarkdownPipelineBuilder()
         .UsePipeTables()
@@ -116,13 +114,16 @@ let loadFile (rootDir: string) (n: string) =
       content = content
       summary = summary }
 
-let loader (projectRoot: string) (siteContent: SiteContents) =
-    let postsPath = Path.Combine(projectRoot, contentDir)
+let loader' (contentDir: string) (projectRoot: string) (siteContent: SiteContents) =
+    let contentPath = Path.Combine(projectRoot, contentDir)
     let options = EnumerationOptions(RecurseSubdirectories = true)
-    let files = Directory.GetFiles(postsPath, "*", options)
+    let files = Directory.GetFiles(contentPath, "*", options)
     files
     |> Array.filter (fun n -> n.EndsWith ".md")
     |> Array.map (loadFile projectRoot)
+
+let loader (projectRoot: string) (siteContent: SiteContents) =
+    loader' "posts" projectRoot siteContent
     |> Array.iter siteContent.Add
 
     siteContent.Add({disableLiveRefresh = false})
