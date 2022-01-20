@@ -3,13 +3,13 @@
 open Config
 open System.IO
 
-let postPredicate (projectRoot: string, page: string) =
+let contentPredicate (layout: string) (projectRoot: string, page: string) =
     let fileName = Path.Combine(projectRoot,page)
     let ext = Path.GetExtension page
     if ext = ".md" then
         let ctn = File.ReadAllText fileName
-        && ctn.Contains("layout: post")
         not (page.Contains("_public"))
+        && ctn.Contains(sprintf "layout: %s" layout)
     else
         false
 
@@ -34,7 +34,7 @@ let config = {
     Generators = [
         {Script = "less.fsx"; Trigger = OnFileExt ".less"; OutputFile = ChangeExtension "css" }
         {Script = "sass.fsx"; Trigger = OnFileExt ".scss"; OutputFile = ChangeExtension "css" }
-        {Script = "post.fsx"; Trigger = OnFilePredicate postPredicate; OutputFile = ChangeExtension "html" }
+        {Script = "post.fsx"; Trigger = OnFilePredicate (contentPredicate "post"); OutputFile = ChangeExtension "html" }
         {Script = "staticfile.fsx"; Trigger = OnFilePredicate staticPredicate; OutputFile = SameFileName }
         {Script = "index.fsx"; Trigger = Once; OutputFile = MultipleFiles id }
         {Script = "about.fsx"; Trigger = Once; OutputFile = NewFileName "about.html" }
