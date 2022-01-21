@@ -126,7 +126,8 @@ let loader' (contentDir: string) (projectRoot: string) =
     |> Array.map (loadFile projectRoot)
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
-    loader' "posts" projectRoot siteContent
+    loader' "posts" projectRoot
+    |> Array.map (fun post -> printfn "Found post: '%s'" post.file; post)
     |> Array.iter siteContent.Add
 
     siteContent.Add({disableLiveRefresh = false})
