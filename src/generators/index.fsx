@@ -1,9 +1,10 @@
 #r "../_lib/Fornax.Core.dll"
 #load "layout.fsx"
+#load "page.fsx"
 
 open Html
 
-let generate' (ctx : SiteContents) (_: string) =
+let generate' (ctx : SiteContents) =
   let posts = ctx.TryGetValues<Postloader.Post> () |> Option.defaultValue Seq.empty
   let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
   let desc, postPageSize =
@@ -63,5 +64,15 @@ let generate' (ctx : SiteContents) (_: string) =
     layoutForPostSet i psts
     |> Layout.render ctx)
 
-let generate (ctx : SiteContents) (projectRoot: string) (page: string) =
-    generate' ctx page
+let generate (ctx : SiteContents) (projectRoot: string) (pageName: string) =
+
+  let simpleHomePage =
+    ctx.TryGetValues<Pageloader.Page>()
+    |> Option.defaultValue Seq.empty
+    |> Seq.tryFind (fun page -> page.file = "pages/index.md")
+
+  match simpleHomePage with
+  | Some page ->
+    [ "index.html", Page.generate' ctx page.file |> Layout.render ctx ] // Page.generate ctx projectRoot pageName ]
+  | None ->
+    generate' ctx

@@ -16,6 +16,7 @@ type Post = {
     tags: string list
     content: string
     summary: string
+    position: int option
 }
 
 let markdownPipeline =
@@ -97,6 +98,7 @@ let loadFile (rootDir: string) (n: string) =
     let title = config |> Map.find "title" |> trimString
     let author = config |> Map.tryFind "author" |> Option.map trimString
     let published = config |> Map.tryFind "published" |> Option.map (trimString >> System.DateTime.Parse)
+    let position = config |> Map.tryFind "position" |> Option.map (trimString >> System.Int32.Parse)
 
     let tags =
         let tagsOpt =
@@ -111,6 +113,7 @@ let loadFile (rootDir: string) (n: string) =
       author = author
       published = published
       tags = tags
+      position = position
       content = content
       summary = summary }
 
