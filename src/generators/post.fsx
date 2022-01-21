@@ -6,11 +6,15 @@ open Html
 
 let generate' (ctx : SiteContents) (page: string) =
     let post =
-        ctx.TryGetValues<Postloader.Post> ()
-        |> Option.defaultValue Seq.empty
-        |> Seq.tryFind (fun n ->
-            printfn "checking if '%s' matches '%s'" n.file page
-            n.file = page)
+        match ctx.TryGetValues<Postloader.Post> () with
+        | None ->
+            let key = typeof<List<Postloader.Post>>
+            key |> printfn "Service not found for key '%A'"
+            None
+        | Some xs ->
+            xs |> Seq.tryFind (fun n ->
+                printfn "checking if '%s' matches '%s'" n.file page
+                n.file = page)
 
     match post with
     | Some post ->
