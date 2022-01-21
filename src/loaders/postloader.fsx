@@ -131,6 +131,8 @@ let loader (projectRoot: string) (siteContent: SiteContents) =
 
     siteContent.Add({disableLiveRefresh = false})
 
+    let key = typeof<Post list>
+    printfn "fetching service for key '%A'" key
     siteContent.TryGetValues<Post> ()
     |> Option.defaultValue Seq.empty
     |> Seq.iter (fun post -> printfn "Found post:\n '%s'\n---------------\n" post.file)
