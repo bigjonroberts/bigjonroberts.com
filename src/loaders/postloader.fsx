@@ -129,6 +129,15 @@ let loader (projectRoot: string) (siteContent: SiteContents) =
     loader' "posts" projectRoot
     |> Array.iter siteContent.Add
 
-    siteContent.Add({disableLiveRefresh = false})
+    let disableLiveRefresh =
+        System.Environment.GetEnvironmentVariable "DISABLE_LIVE_REFRESH"
+        |> Option.ofObj
+        |> Option.defaultValue "false"
+        |> System.Boolean.TryParse
+        |> function
+            | (true, true) -> true
+            | _ -> false
+
+    siteContent.Add({disableLiveRefresh = disableLiveRefresh})
 
     siteContent
