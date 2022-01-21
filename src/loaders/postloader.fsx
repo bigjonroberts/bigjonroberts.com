@@ -127,8 +127,12 @@ let loader' (contentDir: string) (projectRoot: string) =
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
     loader' "posts" projectRoot
-    |> Array.map (fun post -> printfn "Found post:\n '%A'\n---------------\n" post; post)
     |> Array.iter siteContent.Add
 
     siteContent.Add({disableLiveRefresh = false})
+
+    siteContent.TryGetValues<Post> ()
+    |> Option.defaultValue Seq.empty
+    |> Seq.iter (fun post -> printfn "Found post:\n '%s'\n---------------\n" post.file)
+
     siteContent
