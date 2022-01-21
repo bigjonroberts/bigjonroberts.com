@@ -8,8 +8,8 @@ let contentPredicate (layout: string) (projectRoot: string, page: string) =
     let ext = Path.GetExtension page
     if ext = ".md" then
         let ctn = File.ReadAllText fileName
-        not (page.Contains("_public"))
-        && ctn.Contains(sprintf "layout: %s" layout)
+        ctn.Contains(sprintf "layout: %s" layout)
+        && not (page.Contains("_public"))
     else
         false
 
