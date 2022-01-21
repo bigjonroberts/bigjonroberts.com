@@ -16,7 +16,7 @@ let isIndexPage (p:Postloader.Post) = p.file = indexPage
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
 
-    Postloader.loader' "pages" projectRoot siteContent
+    Postloader.loader' "pages" projectRoot
     |> Array.map (fun post ->
         { title = post.title
           link = if isIndexPage post then "/" else post.link

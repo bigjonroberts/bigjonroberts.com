@@ -117,7 +117,7 @@ let loadFile (rootDir: string) (n: string) =
       content = content
       summary = summary }
 
-let loader' (contentDir: string) (projectRoot: string) (siteContent: SiteContents) =
+let loader' (contentDir: string) (projectRoot: string) =
     let contentPath = Path.Combine(projectRoot, contentDir)
     let options = EnumerationOptions(RecurseSubdirectories = true)
     let files = Directory.GetFiles(contentPath, "*", options)
