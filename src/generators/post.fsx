@@ -8,30 +8,37 @@ let generate' (ctx : SiteContents) (page: string) =
     let post =
         ctx.TryGetValues<Postloader.Post> ()
         |> Option.defaultValue Seq.empty
-        |> Seq.find (fun n -> n.file = page)
+        |> Seq.tryFind (fun n -> n.file = page)
 
-    let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
-    let desc =
-        siteInfo
-        |> Option.map (fun si -> si.description)
-        |> Option.defaultValue ""
+    match post with
+    | Some post ->
+        let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
+        let desc =
+            siteInfo
+            |> Option.map (fun si -> si.description)
+            |> Option.defaultValue ""
 
-    Layout.layout ctx post.title [
-        section [Class "hero is-info is-medium is-bold"] [
-            div [Class "hero-body"] [
-                div [Class "container has-text-centered"] [
-                    h1 [Class "title"] [!!desc]
+        Layout.layout ctx post.title [
+            section [Class "hero is-info is-medium is-bold"] [
+                div [Class "hero-body"] [
+                    div [Class "container has-text-centered"] [
+                        h1 [Class "title"] [!!desc]
+                    ]
+                ]
+            ]
+            div [Class "container"] [
+                section [Class "articles"] [
+                    div [Class "column is-8 is-offset-2"] [
+                        Layout.postLayout false post
+                    ]
                 ]
             ]
         ]
-        div [Class "container"] [
-            section [Class "articles"] [
-                div [Class "column is-8 is-offset-2"] [
-                    Layout.postLayout false post
-                ]
-            ]
-        ]
-    ]
+    | None ->
+        printfn "page '%s' not found" page
+        html [] [ !! "page not found" ]
+
+
 
 let generate (ctx : SiteContents) (projectRoot: string) (page: string) =
     generate' ctx page
