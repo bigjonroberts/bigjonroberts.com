@@ -6,30 +6,6 @@
 
 open Html
 
-let injectWebsocketCode (webpage:string) =
-    let websocketScript =
-        """
-        <script type="text/javascript">
-          var wsUri = "ws://localhost:8080/websocket";
-      function init()
-      {
-        websocket = new WebSocket(wsUri);
-        websocket.onclose = function(evt) { onClose(evt) };
-      }
-      function onClose(evt)
-      {
-        console.log('closing');
-        websocket.close();
-        document.location.reload();
-      }
-      window.addEventListener("load", init, false);
-      </script>
-        """
-    let head = "<head>"
-    let index = webpage.IndexOf head
-    webpage.Insert ( (index + head.Length + 1),websocketScript)
-
-
 let layout (ctx : SiteContents) active bodyCnt =
     let pages = ctx.TryGetValues<Contentblockloader.Page> () |> Option.defaultValue Seq.empty
     let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
@@ -45,8 +21,11 @@ let layout (ctx : SiteContents) active bodyCnt =
         a [Class cls; Href p.link] [!! p.title ])
       |> Seq.toList
 
+    let disableLiveRefresh = ctx.TryGetValue<Contentblockloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
+
     html [] [
         head [] [
+            if disableLiveRefresh then () else script [ Type "text/javascript"; Src "/js/websocket.js" ] []
             meta [CharSet "utf-8"]
             meta [Name "viewport"; Content "width=device-width, initial-scale=1"]
             title [] [!! ttl]
@@ -79,10 +58,8 @@ let layout (ctx : SiteContents) active bodyCnt =
     ]
 
 let render (ctx : SiteContents) cnt =
-  let disableLiveRefresh = ctx.TryGetValue<Contentblockloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
   cnt
   |> HtmlElement.ToString
-  |> fun n -> if disableLiveRefresh then n else injectWebsocketCode n
 
 let published (post: Contentblockloader.Post) =
     post.published
