@@ -6,7 +6,7 @@ open Html
 
 let generate' (ctx : SiteContents) (page: string) =
     let post =
-        ctx.TryGetValues<Postloader.Post> ()
+        ctx.TryGetValues<Contentblockloader.Post> ()
         |> Option.defaultValue Seq.empty
         |> Seq.find (fun n -> n.file = page)
 

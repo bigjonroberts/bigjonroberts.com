@@ -5,7 +5,7 @@
 open Html
 
 let generate' (ctx : SiteContents) =
-  let posts = ctx.TryGetValues<Postloader.Post> () |> Option.defaultValue Seq.empty
+  let posts = ctx.TryGetValues<Contentblockloader.Post> () |> Option.defaultValue Seq.empty
   let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
   let desc, postPageSize =
     siteInfo
@@ -67,7 +67,7 @@ let generate' (ctx : SiteContents) =
 let generate (ctx : SiteContents) (projectRoot: string) (pageName: string) =
 
   let simpleHomePage =
-    ctx.TryGetValues<Pageloader.Page>()
+    ctx.TryGetValues<Contentblockloader.Page>()
     |> Option.defaultValue Seq.empty
     |> Seq.tryFind (fun page -> page.file = "pages/index.md")
 
