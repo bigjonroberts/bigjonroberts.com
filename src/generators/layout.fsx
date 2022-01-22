@@ -29,6 +29,42 @@ let injectWebsocketCode (webpage:string) =
     let index = webpage.IndexOf head
     webpage.Insert ( (index + head.Length + 1),websocketScript)
 
+
+let injectMenuCode (webpage:string) =
+    let menuScript =
+        """
+        <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Get all "navbar-burger" elements
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  // Check if there are any navbar burgers
+  if ($navbarBurgers.length > 0) {
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+      el.addEventListener('click', () => {
+
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+      });
+    });
+  }
+
+});
+      </script>
+        """
+    let head = "<head>"
+    let index = webpage.IndexOf head
+    webpage.Insert ( (index + head.Length + 1),menuScript)
+
 let layout (ctx : SiteContents) active bodyCnt =
     let pages = ctx.TryGetValues<Contentblockloader.Page> () |> Option.defaultValue Seq.empty
     let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
@@ -81,6 +117,7 @@ let render (ctx : SiteContents) cnt =
   cnt
   |> HtmlElement.ToString
   |> fun n -> if disableLiveRefresh then n else injectWebsocketCode n
+  |> injectMenuCode
 
 let published (post: Contentblockloader.Post) =
     post.published
