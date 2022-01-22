@@ -1,7 +1,6 @@
 #r "../_lib/Fornax.Core.dll"
 #if !FORNAX
-#load "../loaders/postloader.fsx"
-#load "../loaders/pageloader.fsx"
+#load "../loaders/contentblockloader.fsx"
 #load "../loaders/globalloader.fsx"
 #endif
 
@@ -31,7 +30,7 @@ let injectWebsocketCode (webpage:string) =
     webpage.Insert ( (index + head.Length + 1),websocketScript)
 
 let layout (ctx : SiteContents) active bodyCnt =
-    let pages = ctx.TryGetValues<Pageloader.Page> () |> Option.defaultValue Seq.empty
+    let pages = ctx.TryGetValues<Contentblockloader.Page> () |> Option.defaultValue Seq.empty
     let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
     let ttl =
       siteInfo
@@ -78,17 +77,17 @@ let layout (ctx : SiteContents) active bodyCnt =
     ]
 
 let render (ctx : SiteContents) cnt =
-  let disableLiveRefresh = ctx.TryGetValue<Postloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
+  let disableLiveRefresh = ctx.TryGetValue<Contentblockloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
   cnt
   |> HtmlElement.ToString
   |> fun n -> if disableLiveRefresh then n else injectWebsocketCode n
 
-let published (post: Postloader.Post) =
+let published (post: Contentblockloader.Post) =
     post.published
     |> Option.defaultValue System.DateTime.Now
     |> fun n -> n.ToString("yyyy-MM-dd")
 
-let postLayout (useSummary: bool) (post: Postloader.Post) =
+let postLayout (useSummary: bool) (post: Contentblockloader.Post) =
     div [Class "card article"] [
         div [Class "card-content"] [
             div [Class "media-content has-text-centered"] [

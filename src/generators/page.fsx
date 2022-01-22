@@ -6,7 +6,7 @@ open Html
 
 let generate' (ctx : SiteContents) (pageName: string) =
     let page =
-        ctx.TryGetValues<Pageloader.Page> ()
+        ctx.TryGetValues<Contentblockloader.Page> ()
         |> Option.defaultValue Seq.empty
         |> Seq.find (fun n -> n.file = pageName)
 
