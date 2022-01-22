@@ -3,4 +3,6 @@ layout: page
 title: Contact
 position: 2
 ---
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi nisi diam, vehicula quis blandit id, suscipit sed libero. Proin at diam dolor. In hac habitasse platea dictumst. Donec quis dui vitae quam eleifend dignissim non sed libero. In hac habitasse platea dictumst. In ullamcorper mollis risus, a vulputate quam accumsan at. Donec sed felis sodales, blandit orci id, vulputate orci.
+I can often be found on the [San Antonio Software Developer's Slack](https://sanantoniodevs.com/).
+You can also reach me via [LinkedIn](https://www.linkedin.com/in/bigjonroberts/).
+I can ocassionally be found on [Twitter](https://twitter.com/bigjonroberts).
