@@ -4,6 +4,20 @@
 open System.IO
 open Markdig
 
+type PostConfig = {
+    disableLiveRefresh: bool
+}
+type Post = {
+    file: string
+    link : string
+    title: string
+    author: string option
+    published: System.DateTime option
+    tags: string list
+    content: string
+    summary: string
+}
+
 type Page = {
     title: string
     link: string
@@ -11,6 +25,12 @@ type Page = {
     file: string
     content: string
 }
+
+type private ContentBlock =
+| Post of Post
+| Page of Page
+
+type private ContentDir = | Posts | Pages
 
 let markdownPipeline =
     MarkdownPipelineBuilder()
@@ -71,11 +91,11 @@ let trimString (str : string) =
     str.Trim().TrimEnd('"').TrimStart('"')
 
 [<Literal>]
-let indexPage = "pages/index.md"
+let indexPage = "pages/index.html"
 
 let isIndexPage (link: string) = link = indexPage
 
-let loadFile (rootDir: string) (n: string) =
+let private loadFile (contentType: ContentDir) (rootDir: string) (n: string) =
     let text = File.ReadAllText n
 
     let config = getConfig text
@@ -108,28 +128,59 @@ let loadFile (rootDir: string) (n: string) =
             |> Option.map (trimString >> fun n -> n.Split ',' |> Array.toList)
         defaultArg tagsOpt []
 
-    { file = file
-      link = if isIndexPage link then "/" else link
-      title = title
-      position = position
-      content = content }
+    match contentType with
+    | Posts ->
+        { file = file
+          link = link
+          title = title
+          author = author
+          published = published
+          tags = tags
+          content = content
+          summary = summary }
+        |> Post
+    | Pages ->
+        { file = file
+          link = if isIndexPage link then "/" else link
+          title = title
+          position = position
+          content = content }
+        |> Page
 
-let loader' (projectRoot: string) =
-    let contentPath = Path.Combine(projectRoot, "pages")
+let private loader' (contentDir: ContentDir) (projectRoot: string) =
+    let contentPath = Path.Combine(projectRoot, match contentDir with | Pages -> "pages" | Posts -> "posts")
     let options = EnumerationOptions(RecurseSubdirectories = true)
     let files = Directory.GetFiles(contentPath, "*", options)
     files
     |> Array.filter (fun n -> n.EndsWith ".md")
-    |> Array.map (loadFile projectRoot)
+    |> Array.map (loadFile contentDir projectRoot)
     |> Array.indexed
-    |> Array.sortBy (fun (origOrder,page) -> (page.position,origOrder))
+    |> Array.sortBy (
+        function
+        | (origOrder, Post _) -> (0,0,origOrder)
+        | (origOrder, Page page) -> (1,page.position,origOrder))
     |> Array.map snd
 
 
 let loader (projectRoot: string) (siteContent: SiteContents) =
+    seq {
+        yield! loader' Posts projectRoot
+        yield! loader' Pages projectRoot
+    }
+    |> Seq.iter (
+        function
+        | Post post -> siteContent.Add post
+        | Page page -> siteContent.Add page)
 
-    projectRoot
-    |> loader'
-    |> Array.iter siteContent.Add
+    let disableLiveRefresh =
+        System.Environment.GetEnvironmentVariable "DISABLE_LIVE_REFRESH"
+        |> Option.ofObj
+        |> Option.defaultValue "false"
+        |> System.Boolean.TryParse
+        |> function
+            | (true, true) -> true
+            | _ -> false
+
+    siteContent.Add({disableLiveRefresh = disableLiveRefresh})
 
     siteContent
