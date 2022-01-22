@@ -30,15 +30,6 @@ let injectWebsocketCode (webpage:string) =
     webpage.Insert ( (index + head.Length + 1),websocketScript)
 
 
-let injectMenuCode (webpage:string) =
-    let menuScript =
-        """
-        <script type="text/javascript" src="/js/menuExpand.js" ></script>
-        """
-    let head = "<head>"
-    let index = webpage.IndexOf head
-    webpage.Insert ( (index + head.Length + 1),menuScript)
-
 let layout (ctx : SiteContents) active bodyCnt =
     let pages = ctx.TryGetValues<Contentblockloader.Page> () |> Option.defaultValue Seq.empty
     let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
@@ -64,6 +55,7 @@ let layout (ctx : SiteContents) active bodyCnt =
             link [Rel "stylesheet"; Href "https://fonts.googleapis.com/css?family=Open+Sans"]
             link [Rel "stylesheet"; Href "https://unpkg.com/bulma@0.8.0/css/bulma.min.css"]
             link [Rel "stylesheet"; Type "text/css"; Href "/style/style.css"]
+            script [ Type "text/javascript"; Src "/js/menuExpand.js" ] []
 
         ]
         body [] [
@@ -91,7 +83,6 @@ let render (ctx : SiteContents) cnt =
   cnt
   |> HtmlElement.ToString
   |> fun n -> if disableLiveRefresh then n else injectWebsocketCode n
-  |> injectMenuCode
 
 let published (post: Contentblockloader.Post) =
     post.published
