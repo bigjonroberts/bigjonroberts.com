@@ -9,7 +9,7 @@ type SiteInfo = {
 let loader (projectRoot: string) (siteContent: SiteContents) =
     let siteInfo =
         { title = "Big Jon Roberts";
-          description = "The man, the myth"
+          description = "The Man, The Myth"
           postPageSize = 5 }
     siteContent.Add(siteInfo)
 

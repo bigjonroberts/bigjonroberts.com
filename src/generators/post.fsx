@@ -4,9 +4,9 @@
 open Html
 
 
-let generate' (ctx : SiteContents) (page: string) =
+let generate (ctx : SiteContents) (projectRoot: string) (page: string) =
     let post =
-        ctx.TryGetValues<Contentblockloader.Post> ()
+        ctx.TryGetValues<Postloader.Post> ()
         |> Option.defaultValue Seq.empty
         |> Seq.find (fun n -> n.file = page)
 
@@ -32,7 +32,4 @@ let generate' (ctx : SiteContents) (page: string) =
             ]
         ]
     ]
-
-let generate (ctx : SiteContents) (projectRoot: string) (page: string) =
-    generate' ctx page
-    |> Layout.render ctx
+    |> HtmlElement.ToString

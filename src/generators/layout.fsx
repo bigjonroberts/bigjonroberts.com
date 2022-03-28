@@ -1,13 +1,14 @@
 #r "../_lib/Fornax.Core.dll"
 #if !FORNAX
-#load "../loaders/contentblockloader.fsx"
 #load "../loaders/globalloader.fsx"
+#load "../loaders/postloader.fsx"
+#load "../loaders/pageloader.fsx"
 #endif
 
 open Html
 
 let layout (ctx : SiteContents) active bodyCnt =
-    let pages = ctx.TryGetValues<Contentblockloader.Page> () |> Option.defaultValue Seq.empty
+    let pages = ctx.TryGetValues<Pageloader.Page> () |> Option.defaultValue Seq.empty
     let siteInfo = ctx.TryGetValue<Globalloader.SiteInfo> ()
     let ttl =
       siteInfo
@@ -21,7 +22,7 @@ let layout (ctx : SiteContents) active bodyCnt =
         a [Class cls; Href p.link] [!! p.title ])
       |> Seq.toList
 
-    let disableLiveRefresh = ctx.TryGetValue<Contentblockloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
+    let disableLiveRefresh = ctx.TryGetValue<Postloader.PostConfig> () |> Option.map (fun n -> n.disableLiveRefresh) |> Option.defaultValue false
 
     html [] [
         head [] [
@@ -61,12 +62,12 @@ let render (ctx : SiteContents) cnt =
   cnt
   |> HtmlElement.ToString
 
-let published (post: Contentblockloader.Post) =
+let published (post: Postloader.Post) =
     post.published
     |> Option.defaultValue System.DateTime.Now
     |> fun n -> n.ToString("yyyy-MM-dd")
 
-let postLayout (useSummary: bool) (post: Contentblockloader.Post) =
+let postLayout (useSummary: bool) (post: Postloader.Post) =
     div [Class "card article"] [
         div [Class "card-content"] [
             div [Class "media-content has-text-centered"] [
